@@ -1,0 +1,19 @@
+Cài đặt môi trường:
+Java 1.8 or 11
+Chrome lastest
+
+Cách sử dụng:
+- Viết Step các Test vào Excel theo sheet như trong file Excel Platform.xmls
+Với: 	- Description = Miêu tả thao tác của Steps
+	- Page Name = Vị trí hiện tại của thao tác
+	- Page Object = Locator cần thao tác
+	- Action Keyword = Thao tác cần tác động lên Locator
+	- Dataset = Dữ liệu cần truyền vào để thực hiện Action Keyword
+
+- Chạy file Batch có tên run.bat
+
+Lưu ý:
+- Trước khi chạy phải tắt file Excel đi, vì nếu còn mở thì sẽ chạy sai
+- Nếu viết nhiều TestCase thì set Yes/No ở RunMode để có thể kiểm tra test nhanh hơn, bỏ qua những TestCase ở trước
+
+
