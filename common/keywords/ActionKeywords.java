@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -31,10 +32,10 @@ public class ActionKeywords {
 				WebDriverManager.firefoxdriver().setup();
 				driver = new FirefoxDriver();
 				Log.info("Firefox browser started");
-			} else if (browser.equalsIgnoreCase("IE")) {
-				WebDriverManager.iedriver().setup();
-				driver = new InternetExplorerDriver();
-				Log.info("IE browser started");
+			} else if (browser.equalsIgnoreCase("Edge")) {
+				WebDriverManager.edgedriver().setup();
+				driver = new EdgeDriver();
+				Log.info("Edge browser started");
 			} else if (browser.equalsIgnoreCase("Chrome")) {
 				WebDriverManager.chromedriver().setup();
 				driver = new ChromeDriver();
@@ -88,6 +89,7 @@ public class ActionKeywords {
 
 	public static void click(String locator, String data) {
 		try {
+			waitToElementClickable(driver, locator);
 			Log.info("Clicking on WebElement " + locator);
 			driver.findElement(By.xpath(locator)).click();
 		} catch (Exception e) {
@@ -109,12 +111,28 @@ public class ActionKeywords {
 	public static void sendkeyToElement(String locator, String data) {
 		try {
 			Log.info("Entering the text in " + locator);
+			waitToElementVisuble(driver, locator);
+			driver.findElement(By.xpath(locator)).sendKeys(Keys.CONTROL + "a");
+			driver.findElement(By.xpath(locator)).sendKeys(Keys.DELETE);
 			driver.findElement(By.xpath(locator)).sendKeys(data);
 		} catch (Exception e) {
 			Log.error("Not able to Enter --- " + e.getMessage());
 			RunTestscript.bResult = false;
 		}
 	}
+	
+	public static void clearTextToElement(String locator, String data) {
+		try {
+			Log.info("Clearing the text in " + locator);
+			driver.findElement(By.xpath(locator)).sendKeys(Keys.CONTROL + "a");
+			driver.findElement(By.xpath(locator)).sendKeys(Keys.DELETE);
+			driver.findElement(By.xpath(locator)).clear();;
+		} catch (Exception e) {
+			Log.error("Not able to Clear --- " + e.getMessage());
+			RunTestscript.bResult = false;
+		}
+	}
+	
 	public void clearTextToElement(String locator) {
 		element = getElement(driver, locator);
 		element.sendKeys(Keys.CONTROL + "a");
@@ -127,8 +145,8 @@ public class ActionKeywords {
 
 	public static void sleep(String locator, String data) throws Exception {
 		try {
-			Log.info("Wait for 5 seconds");
-			Thread.sleep(5000);
+			Log.info("Wait for "+data+" seconds");
+			Thread.sleep(Integer.valueOf(data)*1000);
 		} catch (Exception e) {
 			Log.error("Not able to Wait --- " + e.getMessage());
 			RunTestscript.bResult = false;
@@ -137,23 +155,13 @@ public class ActionKeywords {
 
 	public static void selectDropdownList(String locator, String data) throws Exception {
 		try {
+			waitToElementVisuble(driver, locator);
 			Log.info("Select dropdown list");
 			WebElement element = driver.findElement(By.xpath(locator));
 			Select select = new Select(element);
 			select.selectByVisibleText(data);
 		} catch (Exception e) {
 			Log.error("Can not select item in dropdown or not found item --- " + e.getMessage());
-			RunTestscript.bResult = false;
-		}
-	}
-
-	public static void selectDropdown(String locator, String data) {
-		try {
-			Log.info("Selecting to Dropdown/List " + locator);
-			Select dropdown = new Select(driver.findElement(By.xpath(locator)));
-			dropdown.selectByVisibleText(data);
-		} catch (Exception e) {
-			Log.error("Not able to select --- " + e.getMessage());
 			RunTestscript.bResult = false;
 		}
 	}
@@ -191,7 +199,7 @@ public class ActionKeywords {
 	public static void verifyText(String locator, String expectedText) {
 		try {
 			Log.info("VerifyText True ---" + locator);
-			Assert.assertEquals(driver.findElement(By.xpath(locator)).getText(), expectedText);
+			 Assert.assertEquals(driver.findElement(By.xpath(locator)).getText(), expectedText);
 		} catch (Exception e) {
 			Log.error("VerifyText False --- " + e.getMessage());
 			RunTestscript.bResult = false;
@@ -210,7 +218,15 @@ public class ActionKeywords {
 		}
 	}
 	
+	public static void waitToElementVisuble(WebDriver driver, String locator) {
+		explicitWait = new WebDriverWait(driver, 30);
+		explicitWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator)));
+	}
+	public static void waitToElementClickable(WebDriver driver, String locator) {
+		explicitWait = new WebDriverWait(driver, 30);
+		explicitWait.until(ExpectedConditions.elementToBeClickable(By.xpath(locator)));
+	}
 	
-	private WebElement element;
-
+	public WebElement element;
+	public static WebDriverWait explicitWait;
 }
